@@ -1,19 +1,31 @@
 # vital-llm-reasoner
 
+Very much work in progress
+
 # Ensemble Reasoning
 
 Implementation to address deployment in:
 Llama.cpp: CPU and GPU
 vLLM: GPU
-transformers (huggingface): GPU, baseline for ensemble attention implementation
+transformers (huggingface): GPU, baseline for ensemble attention implementation?
+
+Initially all ensemble calls are synchronous and initiated by the LLM Reasoner
+
+# Version 1 Magic Tokens
+
+start ensemble call
+end ensemble call
+
+start ensemble result
+end ensemble result
 
 # Version 1 Tags
 
-<|ensemble:member|>
-<|/ensemble:member|>
+<ensemble:member_request>
+</ensemble:member_request>
 
-<|ensemble_result:member|>
-<|/ensemble_result:member|>
+<ensemble:member_response>
+</ensemble:member_response>
 
 member is one of:
 web_search
@@ -22,6 +34,7 @@ kgraph_search
 kgraph_traverse
 logic_query
 code_executor
+llm
 
 logic_query terms for testing:
 friend(?Friend)
@@ -35,3 +48,7 @@ traverse_outgoing('uri', ?Node)
 # Use JSON Schema
  include request id
  
+Potentially handle async cases with:
+1) initial ensemble call
+2) acknowledgement
+3) result 
