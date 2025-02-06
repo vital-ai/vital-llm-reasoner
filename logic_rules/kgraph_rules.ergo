@@ -108,7 +108,8 @@ search_friends(?SearchTerm, ?Friend) :-
 get_friend(?Friend, ?FriendString) :-
     friend(?Friend),
     ?FriendObj:Person[URI -> ?Friend],
-    get_frame(?Friend, ?FriendString).
+    ?M = \@,
+    get_frame_string(?Friend, ?M, ?FriendString).
 
 get_frame(?URI, ?FrameString) :-
     ?FrameObj:Frame[URI -> ?URI],

@@ -1,8 +1,6 @@
 import os
-
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
-
 from vital_llm_reasoner.config.reasoner_config import ReasonerConfig
 from vital_llm_reasoner.ensemble.member.answer import Answer
 from vital_llm_reasoner.ensemble.member.ensemble_member import EnsembleMember

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='vital-llm-reasoner',
-    version='0.0.3',
+    version='0.0.6',
     author='Marc Hadfield',
     author_email='marc@vital.ai',
     description='Vital LLM Reasoner',
@@ -13,8 +13,13 @@ setup(
     license='Apache License 2.0',
     install_requires=[
 
-            'langchain-openai==0.2.1'
-            'openai==1.50.2',
+            # 'pygame', # user for local test
+
+
+            'lark',
+
+            'langchain-openai==0.2.1',
+            'openai==1.52.0',
             'langchain==0.3.9',
 
             'langchain_openai',
@@ -31,7 +36,13 @@ setup(
             'nltk',
             'bs4',
             'pdfplumber',
-            'pyppeteer',
+
+            'scrapy',
+            'scrapy-playwright',
+
+            'playwright',
+
+            'markitdown',
 
             'black',
 
@@ -52,13 +63,16 @@ setup(
 
             'sentence_transformers>=3.3.1',
 
+            # remove this, update Orchestrator
+            'llama-cpp-python>=0.2.20'
+
     ],
     extras_require={
         "llamacpp": [
             'llama-cpp-python>=0.2.20',
         ],
         "vllm": [
-            'vllm>=0.6.6',
+            'vllm>=0.7.0',
         ]
     },
     classifiers=[

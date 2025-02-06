@@ -4,7 +4,8 @@ from transformers import AutoTokenizer
 from transformers.models.auto.tokenization_auto import PreTrainedTokenizerFast
 
 from vital_llm_reasoner.reasoner.ensemble_prompt import EnsemblePrompt
-from vital_llm_reasoner.reasoner.ensemble_reasoner import EnsembleReasoner
+from vital_llm_reasoner.reasoner.ensemble_reasoner import EnsembleReasoner, EnsembleReasonerType
+
 
 class QWQReasoner(EnsembleReasoner):
 
@@ -12,6 +13,7 @@ class QWQReasoner(EnsembleReasoner):
         super().__init__(**kwargs)
         self.model_path = model_path
         self.tokenizer_path = tokenizer_path
+        self.reasoner_type = EnsembleReasonerType.QWQ_REASONER
 
 
         self.tokenizer = AutoTokenizer.from_pretrained(
@@ -47,6 +49,9 @@ class QWQReasoner(EnsembleReasoner):
     def get_llm(self) -> Llama:
         return self.llm
 
+    def get_reasoner_type(self) -> EnsembleReasonerType:
+        return self.reasoner_type
+
     def generate_tokens(self, prompt: EnsemblePrompt, logits_processor: LogitsProcessorList) -> Generator[CreateCompletionResponse, None, None]:
 
         sampling_params = {
@@ -57,6 +62,7 @@ class QWQReasoner(EnsembleReasoner):
 
         prompt_text = self.tokenizer.apply_chat_template(prompt.prompt, tokenize=False, add_generation_prompt=True)
 
+       
         print(prompt_text)
 
         for token_data in self.llm(

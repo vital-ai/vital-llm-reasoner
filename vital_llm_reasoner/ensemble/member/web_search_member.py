@@ -25,9 +25,18 @@ class WebSearchMember(EnsembleMember):
       task_tag = TaskTag('web_search')
       return task_tag
 
+   # consider including separate terms for a web query and
+   # for an explanation of the goal of the query
+   # with the goal able to help interpret and summarize the results
+   # potentially get the full content of each resulting page where possible
+   # use dict:
+   # { "search_goal": "text", "search_query": "query terms", "retrieve_content": true }
+
    def handle_inquiry(self, inquiry: Inquiry) -> Answer:
 
       inquiry_string = inquiry.inquiry
+
+      # parse inquery string into search terms and goal
 
       answer_string = "No answer"
 
@@ -38,6 +47,12 @@ class WebSearchMember(EnsembleMember):
          "q": inquiry_string,
          "api_key": google_search_key
       }
+
+      # if get_content is true
+      # get the content of the URLs via extract tool
+      # for each URL, do a summary related to the goal
+      # combine these summaries into the prompt
+      # generate results by combining search results json info with summaries
 
       summarize_instructions = """Given a query, you summarize web search results into the relevant content for the query.
       You only include the information from the source material, and nothing else.

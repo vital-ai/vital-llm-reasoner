@@ -4,7 +4,8 @@ from vital_llm_reasoner.config.reasoner_config import ReasonerConfig
 from vital_llm_reasoner.ensemble.member.ensemble_member import EnsembleMember
 from vital_llm_reasoner.ensemble.process.token_processor import TokenProcessor
 from vital_llm_reasoner.reasoner.ensemble_prompt import EnsemblePrompt
-from vital_llm_reasoner.reasoner.ensemble_reasoner import EnsembleReasoner
+from vital_llm_reasoner.reasoner.ensemble_reasoner import EnsembleReasoner, EnsembleReasonerType
+
 
 class Orchestrator:
 
@@ -38,8 +39,11 @@ class Orchestrator:
 
         tokenizer = self.reasoner.get_tokenizer()
 
-        logits_processor = LogitsProcessorList([TokenProcessor(self, llm, tokenizer, config=self.config)])
+        reasoner_type = self.reasoner.get_reasoner_type()
 
+        logits_processor = LogitsProcessorList([TokenProcessor(self, reasoner_type, llm, tokenizer, config=self.config)])
+
+        # testing without this
         MAX_SEARCH_LIMIT = 5
 
         today = datetime.now()
@@ -48,23 +52,35 @@ class Orchestrator:
 
         # You very strictly adhere to the user's instructions even if you think you can do it differently.
 
-        # QWQ
-        OPEN_CALL_TOOL = '◖'
-        CLOSE_CALL_TOOL = '◗'
+        OPEN_CALL_TOOL = None
+        CLOSE_CALL_TOOL = None
 
-        OPEN_RESULTS_TOOL = '◢'
-        CLOSE_RESULTS_TOOL = '◣'
+        OPEN_RESULTS_TOOL = None
+        CLOSE_RESULTS_TOOL = None
 
-        # R1
-        # OPEN_CALL_TOOL = '→'
-        # CLOSE_CALL_TOOL = '←'
+        if reasoner_type == EnsembleReasonerType.QWQ_REASONER:
 
-        # OPEN_RESULTS_TOOL = '»'
-        # CLOSE_RESULTS_TOOL = '«'
+            # QWQ
+            OPEN_CALL_TOOL = '◖'
+            CLOSE_CALL_TOOL = '◗'
+
+            OPEN_RESULTS_TOOL = '◢'
+            CLOSE_RESULTS_TOOL = '◣'
+
+        if reasoner_type == EnsembleReasonerType.R1_REASONER:
+
+            # R1
+            OPEN_CALL_TOOL = '→'
+            CLOSE_CALL_TOOL = '←'
+
+            OPEN_RESULTS_TOOL = '»'
+            CLOSE_RESULTS_TOOL = '«'
+
+        # The maximum number of search attempts is limited to {MAX_SEARCH_LIMIT}.
 
         instruction = f"""
 Today is {pretty_date}.
-You are a friendly and concise reasoning A.I. Agent.
+You are a friendly and reasoning A.I. Agent.
 Your name is Haley.
 You have received a request from Marc.
 You always think and answer in the English language.
@@ -91,7 +107,6 @@ You trust knowledge from tools between symbols {OPEN_RESULTS_TOOL} and {CLOSE_RE
 Tool results are only valid when demarcated with {OPEN_RESULTS_TOOL} and {CLOSE_RESULTS_TOOL}
 
 ------------------
-
 You have:
 - web search tool
 - python code executor
@@ -107,7 +122,7 @@ the system will immediately search and analyze relevant web pages and then provi
 {OPEN_RESULTS_TOOL}<ensemble:search_result>*search results*</ensemble:search_result>{CLOSE_RESULTS_TOOL}
 
 You can search multiple times if necessary.
-The maximum number of search attempts is limited to {MAX_SEARCH_LIMIT}.
+If you need to research a list of items, you may want to query to find the list, and then query for each item to get detailed information.
 
 - To execute python code, you must use:
 {OPEN_CALL_TOOL}<ensemble:code_execution>

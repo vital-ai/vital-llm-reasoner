@@ -2,6 +2,9 @@
 
 Very much work in progress
 
+Needs to do:
+playwright install 
+
 # Ensemble Reasoning
 
 Implementation to address deployment in:

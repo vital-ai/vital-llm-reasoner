@@ -18,8 +18,17 @@ class LogicQueryMember(EnsembleMember):
       ergo_root = config.ERGO_ROOT
       xsb_dir = config.XSB_DIR
 
+      # print(f"ERGO_ROOT: {ergo_root}")
+      # print(f"XSB_DIR: {xsb_dir}")
+
+      print("opening ergo session...")
+
       pyergo_start_session(xsb_dir, ergo_root)
-      pyergo_command("add {'/Users/hadfield/Local/vital-git/vital-llm-reasoner/logic_rules/kgraph_rules.ergo'}.")
+
+      # TODO config for this
+      # pyergo_command("add {'/Users/hadfield/Local/vital-git/vital-llm-reasoner/logic_rules/kgraph_rules.ergo'}.")
+
+      pyergo_command("add {'/app/logic_rules/kgraph_rules.ergo'}.")
 
    @classmethod
    def get_task_tag(cls) -> TaskTag:
@@ -66,7 +75,7 @@ class LogicQueryMember(EnsembleMember):
             answer_string = "No answer.  Please confirm your ensemble tag and query are correct."
 
          if isinstance(results_list, list) and len(results_list) == 0:
-            answer_string = "No answer. Please confirm your ensemble tag and query are correct."
+            answer_string = "The query returned zero results.  Please confirm the query is correct."
 
          # what is this case?
          if isinstance(results_list, tuple):

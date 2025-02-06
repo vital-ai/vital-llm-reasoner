@@ -3,7 +3,14 @@ from transformers import AutoTokenizer
 # tokenizer = AutoTokenizer.from_pretrained("Qwen/QwQ-32B-Preview")
 # tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/DeepSeek-R1")
 
-tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-Llama-70B")
+# tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-Llama-70B")
+
+# tokenizer = AutoTokenizer.from_pretrained("Valdemardi/DeepSeek-R1-Distill-Qwen-32B-AWQ")
+
+
+tokenizer = AutoTokenizer.from_pretrained("Valdemardi/DeepSeek-R1-Distill-Llama-70B-AWQ")
+
+
 
 
 symbols = ["◖", "◗", "◢", "◣", "◒", "◓","→","←","»","«"]

@@ -7,6 +7,7 @@ from vital_llm_reasoner.ensemble.member.llm_member import LLMMember
 from vital_llm_reasoner.ensemble.member.logic_query_member import LogicQueryMember
 from vital_llm_reasoner.ensemble.member.web_search_member import WebSearchMember
 from vital_llm_reasoner.ensemble.process import orchestrator
+from vital_llm_reasoner.reasoner.ensemble_reasoner import EnsembleReasonerType
 
 SEARCH_QUERY = "search_query"
 SEARCH_RESULT = "search_result"
@@ -30,57 +31,11 @@ END_CODE_RESULT = "</ensemble:code_result>"
 BEGIN_LLM_RESULT = "<ensemble:llm_result>"
 END_LLM_RESULT = "</ensemble:llm_result>"
 
-
 BEGIN_LOGIC_QUERY_RESULT = "<ensemble:logic_query_result>"
+
 END_LOGIC_QUERY_RESULT = "</ensemble:logic_query_result>"
 
 # END_SEARCH_STRING = f"{END_SEARCH_QUERY}◗"
-
-# QWQ
-START_TOOL_CALL = 148320
-END_TOOL_CALL= 146152
-
-# R1
-# START_TOOL_CALL = 52118
-# END_TOOL_CALL = 72958
-
-# token(52118): '→'
-# token(72958): '←'
-
-
-# token(8674): '→'
-# token(57258): '←'
-
-
-# QWQ
-START_TOOL_RESULTS = 146634
-END_TOOL_RESULTS = 146877
-
-# R1
-# START_TOOL_RESULTS = 13289
-# END_TOOL_RESULTS = 24633
-
-
-
-OPEN_CALL_TOOL = '◖'
-CLOSE_CALL_TOOL = '◗'
-
-# token(8674): '→'
-# token(57258): '←'
-
-# OPEN_CALL_TOOL = '→'
-# CLOSE_CALL_TOOL = '←'
-
-# QWQ
-OPEN_RESULTS_TOOL = '◢'
-CLOSE_RESULTS_TOOL = '◣'
-
-
-# R1
-# OPEN_RESULTS_TOOL = '»'
-# CLOSE_RESULTS_TOOL = '«'
-
-
 
 # using these in the prompt for starting/ending thoughts didn't work
 # LOWER_CIRCLE = 149410
@@ -98,7 +53,7 @@ CLOSE_RESULTS_TOOL = '◣'
 # things go off the rails when search results do not directly follow request
 
 class TokenProcessor(LogitsProcessor):
-    def __init__(self, orchestrator, llm: Llama, tokenizer, *, config:ReasonerConfig=None):
+    def __init__(self, orchestrator, reasoner_type, llm: Llama, tokenizer, *, config:ReasonerConfig=None):
 
         from vital_llm_reasoner.ensemble.process.orchestrator import Orchestrator
         assert isinstance(orchestrator, Orchestrator)
@@ -111,6 +66,7 @@ class TokenProcessor(LogitsProcessor):
         self.config=config
         self.ensemble_result = None
         self.ensemble_result_tokens = None
+        self.reasoner_type = reasoner_type
 
     def __call__(self, input_ids, scores):
         # Decode the current token from input_ids
@@ -121,6 +77,57 @@ class TokenProcessor(LogitsProcessor):
             current_token_id = 0
             current_token = "" # "<No input IDs yet>"
 
+        START_TOOL_RESULTS = None
+        END_TOOL_RESULTS = None
+
+        END_TOOL_CALL = None
+        CLOSE_CALL_TOOL = None
+
+        OPEN_RESULTS_TOOL = None
+        CLOSE_RESULTS_TOOL = None
+
+        # print(f"Reasoner Type: {self.reasoner_type}")
+
+        if self.reasoner_type == EnsembleReasonerType.QWQ_REASONER:
+            # QWQ
+            START_TOOL_CALL = 148320
+            END_TOOL_CALL = 146152
+
+            # QWQ
+            START_TOOL_RESULTS = 146634
+            END_TOOL_RESULTS = 146877
+
+            OPEN_CALL_TOOL = '◖'
+            CLOSE_CALL_TOOL = '◗'
+
+            # QWQ
+            OPEN_RESULTS_TOOL = '◢'
+            CLOSE_RESULTS_TOOL = '◣'
+
+        if self.reasoner_type == EnsembleReasonerType.R1_REASONER:
+            # R1
+            START_TOOL_CALL = 52118
+            END_TOOL_CALL = 72958
+
+            # R1
+            START_TOOL_RESULTS = 13289
+            END_TOOL_RESULTS = 24633
+
+            OPEN_CALL_TOOL = '→'
+            CLOSE_CALL_TOOL = '←'
+
+            # R1
+            OPEN_RESULTS_TOOL = '»'
+            CLOSE_RESULTS_TOOL = '«'
+
+        # token(52118): '→'
+        # token(72958): '←'
+
+        # token(8674): '→'
+        # token(57258): '←'
+
+        # token(8674): '→'
+        # token(57258): '←'
 
         # print(f"current token: {current_token_id} : '{current_token}'")
 
@@ -148,6 +155,12 @@ class TokenProcessor(LogitsProcessor):
         matches = list(re.finditer(pattern, self.gen_buffer))
 
         # print(f"buffer: {self.gen_buffer}")
+
+        if current_token_id == END_TOOL_CALL:
+            # print("End tool call")
+            # print(f"buffer: {self.gen_buffer}")
+            pass
+
 
         # look for new request or inserting tokens from existing one
         if (current_token_id == END_TOOL_CALL and matches and matches[-1].group(0).endswith(CLOSE_CALL_TOOL)) or self.ensemble_result is not None:

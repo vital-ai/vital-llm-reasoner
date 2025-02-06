@@ -69,7 +69,17 @@ Give me a list of my friends.
        Use your assistant to write code to calculate a factorial and then use the code executor to run it to calculate the factorial of 20.
        """
 
-    user_message = user_message_7
+
+    # Notes:
+    # orchestrator is meant to be re-used for different requests
+    # init-ing members might be heavy so should be re-used
+    # a given call may include a JWT token and other state such as user id.
+
+    # these would need to be captured by the server (vLLM) when a request is posted
+    # and passed in on the request for:
+    # handle_user_message()
+
+    user_message = user_message_2
 
     web_search_member = WebSearchMember(config=reasoner_config)
     logic_query_member = LogicQueryMember(config=reasoner_config)
